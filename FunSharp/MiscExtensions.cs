@@ -43,7 +43,7 @@ namespace FunSharp
         }
 
         /// <summary>
-        /// Converte um Res[T] em um IObservable[T].
+        /// Converte um Res[T] em um IObservable[T] (Rx.Net).
         /// </summary>
         /// <typeparam name="T">Tipo do valor</typeparam>
         /// <param name="res">Res[T]</param>

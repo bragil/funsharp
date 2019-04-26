@@ -6,7 +6,7 @@ namespace FunSharp.Tests
     public class ResTests
     {
         [Test]
-        public void Deve_Ser_Resultado_Sucesso_Some()
+        public void Should_Be_Some_Success_Result()
         {
             var res1 = new Res<int>(100);
 
@@ -24,16 +24,16 @@ namespace FunSharp.Tests
         }
 
         [Test]
-        public void Deve_Ser_Resultado_Erro()
+        public void Should_Be_Error_Result()
         {
-            var res1 = new Res<int>(new Error(message: "Nada bom"));
+            var res1 = new Res<int>(new Error(message: "Oh no!"));
 
             res1.IsSuccess.ShouldBe(false);
             res1.IsSome.ShouldBe(false);
             res1.IsError.ShouldBe(true);
             res1.IsNone.ShouldBe(false);
 
-            var res2 = new Res<Unit>(new Error(message: "Nada bom de novo"));
+            var res2 = new Res<Unit>(new Error(message: "Oh no again!"));
 
             res2.IsSuccess.ShouldBe(false);
             res2.IsSome.ShouldBe(false);
@@ -42,7 +42,7 @@ namespace FunSharp.Tests
         }
 
         [Test]
-        public void Deve_Ser_Resultado_None()
+        public void Should_Be_None_Result()
         {
             var res1 = new Res<int>(None.Instance);
 
@@ -60,22 +60,22 @@ namespace FunSharp.Tests
         }
 
         [Test]
-        public void Deve_Ter_Novo_Valor_Apos_Then()
+        public void Should_Have_New_Value_After_Then()
         {
             var res1 = new Res<int>(256);
 
-            var novoRes = res1.Then(n => n.ToString());
+            var newRes = res1.Then(n => n.ToString());
 
-            var valor = novoRes.Match(
+            var valor = newRes.Match(
                                     s => s,
                                     e => e.Message,
                                     () => ""
                                 );
 
-            novoRes.IsSuccess.ShouldBeTrue();
-            novoRes.IsSome.ShouldBeTrue();
-            novoRes.IsError.ShouldBeFalse();
-            novoRes.IsNone.ShouldBeFalse();
+            newRes.IsSuccess.ShouldBeTrue();
+            newRes.IsSome.ShouldBeTrue();
+            newRes.IsError.ShouldBeFalse();
+            newRes.IsNone.ShouldBeFalse();
 
             valor.ShouldBe("256");
         }

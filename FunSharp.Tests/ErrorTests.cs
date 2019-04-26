@@ -1,5 +1,4 @@
-﻿using FunSharp;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Shouldly;
 using System;
 
@@ -8,22 +7,22 @@ namespace FunSharp.Tests
     public class ErrorTests
     {
         [Test]
-        public void Deve_Ter_Mensagem_da_Exception()
+        public void Should_Have_Exception_Message()
         {
-            var mensagem = "bla bla bla";
-            var erro = new Error(new Exception(mensagem));
+            var message = "bla bla bla";
+            var error = new Error(new Exception(message));
 
-            erro.Message.ShouldBe(mensagem);
+            error.Message.ShouldBe(message);
         }
 
         [Test]
-        public void Deve_Ter_Exception_ErrorData_Nulos()
+        public void Should_Have_Null_ErrorData()
         {
-            var mensagem = "bla bla bla";
-            var erro = new Error(message: mensagem);
+            var message = "bla bla bla";
+            var error = new Error(message: message);
 
-            erro.Exception.ShouldBeNull();
-            erro.ErrorData.ShouldBeNull();
+            error.Exception.ShouldBeNull();
+            error.ErrorData.ShouldBeNull();
         }
     }
 }
