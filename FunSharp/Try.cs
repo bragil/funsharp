@@ -28,6 +28,7 @@ namespace FunSharp
         /// <typeparam name="T">Tipo do valor</typeparam>
         /// <param name="function">Função a ser executada</param>
         /// <param name="errorMessage">Mensagem customizada de erro (opcional)</param>
+        /// <param name="errorData">Qualquer objeto relacionado ao erro.</param>
         /// <returns>Res[T]</returns>
         public static Res<T> Try<T>(Func<T> function, string errorMessage = null, object errorData = null)
         {
@@ -44,11 +45,50 @@ namespace FunSharp
         /// <summary>
         /// Encapsula o bloco try..catch.
         /// </summary>
+        /// <typeparam name="T">Tipo do valor</typeparam>
+        /// <param name="function">Função a ser executada</param>
+        /// <param name="errorMessage">Mensagem customizada de erro (opcional)</param>
+        /// <param name="errorData">Qualquer objeto relacionado ao erro.</param>
+        /// <returns>Task[Res[T]]</returns>
+        public static async Task<Res<T>> TryAsync<T>(Func<Task<T>> function, string errorMessage = null, object errorData = null)
+        {
+            try
+            {
+                return await Res.OfAsync(function());
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new Error(ex));
+            }
+        }
+
+        /// <summary>
+        /// Encapsula o bloco try..catch.
+        /// </summary>
         /// <param name="function">Função a ser executada</param>
         /// <param name="errorMessage">Mensagem customizada de erro (opcional)</param>
         /// <returns>Res[Unit]</returns>
         public static Res<Unit> Try(Action action, string errorMessage = null, object errorData = null)
             => Try(FunSharpUtils.ToFunc(action), errorMessage, errorData);
+
+        /// <summary>
+        /// Encapsula o bloco try..catch.
+        /// </summary>
+        /// <param name="function">Função a ser executada</param>
+        /// <param name="errorMessage">Mensagem customizada de erro (opcional)</param>
+        /// <returns>Task[Res[Unit]]</returns>
+        public static async Task<Res<Unit>> TryAsync(Action action, string errorMessage = null, object errorData = null)
+        {
+            try
+            {
+                action();
+                return await Task.FromResult(Unit.Instance);
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new Error(ex));
+            }
+        }
 
         /// <summary>
         /// 

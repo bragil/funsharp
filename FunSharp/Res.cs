@@ -262,5 +262,14 @@ namespace FunSharp
         /// <returns>Res[T]</returns>
         public static Res<T> Of<T>(T value)
             => new Res<T>(value);
+
+        /// <summary>
+        /// Transforma um Task[T] em um Task[Res[T]].
+        /// </summary>
+        /// <typeparam name="T">Tipo do valor</typeparam>
+        /// <param name="taskValue">Task do valor</param>
+        /// <returns>Task[Res[T]]</returns>
+        public static async Task<Res<T>> OfAsync<T>(Task<T> taskValue)
+            => Of(await taskValue);
     }
 }

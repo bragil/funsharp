@@ -159,7 +159,7 @@ namespace FunSharp.Tests
         [Test]
         public async Task Deve_Retornar_Unit_De_Task_Res()
         {
-            var taskRes = Task.FromResult(Res.Of(10));
+            var taskRes = Task.FromResult(Res.Of(10));           
 
             var number = (await taskRes.ThenAsync(n => n * Math.PI)
                                        .ThenAsync(d => Debug.Write(d)))
@@ -170,6 +170,15 @@ namespace FunSharp.Tests
                                        );
 
             Assert.AreEqual(1, number);
+        }
+
+        [Test]
+        public async Task Deve_Transformar_Task_T_Em_Task_Res_T()
+        {
+            var task = Task.FromResult(5);
+            var number = (await Res.OfAsync(task)).GetValueOrElse(-1);
+
+            Assert.AreEqual(5, number);
         }
 
     }
