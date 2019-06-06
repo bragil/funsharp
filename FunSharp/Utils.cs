@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FunSharp
 {
-    public static class Utils
+    public static class FunSharpUtils
     {
         /// <summary>
         /// Converte um Action[T] para um Func[T, Unit].
