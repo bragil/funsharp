@@ -11,11 +11,11 @@ Provides a functional programming approach to handle exceptions in an elegant wa
     <PackageProjectUrl>https://github.com/bragil/funsharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bragil/funsharp</RepositoryUrl>
     <PackageTags>functional railway monad</PackageTags>
-    <AssemblyVersion>1.0.5.0</AssemblyVersion>
-    <FileVersion>1.0.5.0</FileVersion>
+    <AssemblyVersion>1.0.6.0</AssemblyVersion>
+    <FileVersion>1.0.6.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,7 +2,11 @@
 
 namespace FunSharp
 {
-    public struct Opt<TValue>
+    /// <summary>
+    /// Valor opcional
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    public class Opt<TValue>
     {
         private TValue Value { get; set; }
         public bool IsSome { get; }
@@ -15,14 +19,14 @@ namespace FunSharp
             IsSome = !IsNone;
         }
 
-        public Opt(None none)
+        public Opt(None _)
         {
             Value = default;
             IsNone = true;
             IsSome = false;
         }
 
-        public TValue GetValue()
+        internal TValue GetValue()
             => Value;
 
         /// <summary>
@@ -57,11 +61,11 @@ namespace FunSharp
         /// Operador de cast implícito para None (nenhum valor).
         /// </summary>
         /// <param name="none">Objeto None</param>
-        public static implicit operator Opt<TValue>(None none)
+        public static implicit operator Opt<TValue>(None _)
             => new Opt<TValue>(None.Instance);
     }
 
-    public struct Option
+    public class Opt
     {
         public static Opt<T> Of<T>(T value)
             => new Opt<T>(value);

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FunSharp
 {
-    public class Error : IError
+    public class Error 
     {
         public Exception Exception { get; set; }
 

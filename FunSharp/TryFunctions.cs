@@ -58,7 +58,7 @@ namespace FunSharp
             }
             catch (Exception ex)
             {
-                return await Task.FromResult(new Error(ex));
+                return await Task.FromResult(new Error(exception: ex, message: errorMessage ?? ex.Message, errorData: errorData));
             }
         }
 
@@ -86,7 +86,7 @@ namespace FunSharp
             }
             catch (Exception ex)
             {
-                return await Task.FromResult(new Error(ex));
+                return await Task.FromResult(new Error(exception: ex, message: errorMessage ?? ex.Message, errorData: errorData));
             }
         }
 
@@ -99,8 +99,11 @@ namespace FunSharp
         /// <param name="errorMessage"></param>
         /// <param name="errorData"></param>
         /// <returns></returns>
-        public static Res<T> Use<T, TDisp>(TDisp disp, Func<TDisp, T> function, string errorMessage = null, object errorData = null)
-            where TDisp: IDisposable
+        public static Res<T> Use<T, TResource>(TResource disp, 
+                                               Func<TResource, T> function, 
+                                               string errorMessage = null, 
+                                               object errorData = null)
+            where TResource: IDisposable
         {
             try
             {
@@ -125,7 +128,10 @@ namespace FunSharp
         /// <param name="errorMessage"></param>
         /// <param name="errorData"></param>
         /// <returns></returns>
-        public static Res<Unit> Use<TResource>(TResource disp, Action<TResource> function, string errorMessage = null, object errorData = null)
+        public static Res<Unit> Use<TResource>(TResource disp, 
+                                               Action<TResource> function, 
+                                               string errorMessage = null, 
+                                               object errorData = null)
             where TResource : IDisposable
         {
             try
