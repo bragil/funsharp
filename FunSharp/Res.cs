@@ -287,7 +287,7 @@ namespace FunSharp
         /// <param name="error">Função a ser executada em caso de erro</param>
         /// <returns>Resultado de uma das funções passadas</returns>
         public T Match<T>(Func<T> success, Func<Error, T> error)
-            => IsError ? success() : error(this.error);
+            => IsSuccess ? success() : error(this.error);
 
         /// <summary>
         /// Resultado bem-sucedido de uma execução.
