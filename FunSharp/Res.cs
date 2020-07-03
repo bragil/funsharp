@@ -8,10 +8,10 @@ namespace FunSharp
     /// Resultado de uma computação com retorno de valor.
     /// </summary>
     /// <typeparam name="TValue">Tipo do objeto de valor</typeparam>
-    public class Res<TValue>
+    public struct Res<TValue>
     {
         private readonly Error error;
-        private Opt<TValue> value;
+        private readonly Opt<TValue> value;
 
         public bool IsError { get; }
         public bool IsSome { get; }
@@ -35,7 +35,7 @@ namespace FunSharp
             IsSome = false;
         }
 
-        internal Res(None none)
+        internal Res(None _)
         {
             value = Opt.Empty<TValue>();
             error = default;
@@ -53,6 +53,23 @@ namespace FunSharp
             => IsError ? fallback : value.GetValueOrElse(fallback);
 
         /// <summary>
+        /// Tenta obter o valor. Em caso de erro ou inexistência de valor, 
+        /// executa suas respectivas funções passadas.
+        /// </summary>
+        /// <param name="errorFunction">Função a ser executada em caso de erro</param>
+        /// <param name="noneFunction">Função a ser executada em caso de inexistência de valor</param>
+        /// <returns>Valor</returns>
+        public TValue GetValueOrMatch(Func<Error, TValue> errorFunction, Func<None, TValue> noneFunction)
+        {
+            if (IsSome)
+                return value.GetValue();
+            else if (IsError)
+                return errorFunction(error);
+            else
+                return noneFunction(None.Instance);
+        }
+
+        /// <summary>
         /// Pattern matching do resultado, possibilita obter o valor.
         /// </summary>
         /// <typeparam name="T">Tipo de retorno</typeparam>
@@ -60,26 +77,61 @@ namespace FunSharp
         /// <param name="error">Função a ser executada em execuções com erro.</param>
         /// <param name="none">Função a ser executada em execuções bem-sucedidas que não retornam valor.</param>
         /// <returns>T</returns>
-        public T Match<T>(Func<TValue, T> some, Func<Error, T> error, Func<None, T> none = null)
+        public T Match<T>(
+                Func<TValue, T> some, 
+                Func<Error, T> error, 
+                Func<None, T> none = null)
             => IsError ? error(this.error) : value.Match(some, none);
 
         /// <summary>
-        /// Pattern matching do resultado, obtém o valor do resultado, se houver (IsSome).
-        /// Se houve algum erro (IsError), retorna o resultado da função error.
-        /// Se não retornou nenhum valor (IsNone), retorna o resultado da função none.
+        /// Em caso de erro, executa a função passada.
         /// </summary>
-        /// <param name="error">Função a ser executada em execuções com erro.</param>
-        /// <param name="none">Função a ser executada em execuções bem-sucedidas que não retornam valor (opcional).</param>
-        /// <returns></returns>
-        public TValue Match(Func<Error, TValue> error, Func<None, TValue> none = null)
+        /// <param name="function">Função a ser executada em caso de erro</param>
+        /// <returns>Instância atual</returns>
+        public Res<TValue> OnError(Action<Error> function)
         {
             if (IsError)
-                return error(this.error);
-            else if (IsSome)
-                return value.GetValue();
-            else
-                return none(None.Instance);
-        } 
+                function(error);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Em caso de execução bem-sucedida com retorno de valor, executa a função passada.
+        /// </summary>
+        /// <param name="someFunction">Função a ser executada em caso retorno de valor</param>
+        /// <param name="noneFunction">Função a ser executada em caso de não retornar valor (None)</param>
+        /// <returns>Instância atual</returns>
+        public Res<TValue> OnSuccess(Action<TValue> someFunction, Action noneFunction = null)
+        {
+            try
+            {
+                if (IsSome)
+                    someFunction(value.GetValue());
+                else
+                    noneFunction?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                return new Error(ex, ex.Message);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Combina o objeto do resultado passado, se não houver erro no resultado atual.
+        /// </summary>
+        /// <typeparam name="T">Tipo do valor</typeparam>
+        /// <param name="res">Objeto do resultado</param>
+        /// <returns>Novo resultado passado</returns>
+        public Res<T> Combine<T>(Res<T> res)
+        {
+            if (IsError)
+                return error;
+
+            return res;
+        }
 
         /// <summary>
         /// Executa a função e retorna o resultado.
@@ -90,10 +142,21 @@ namespace FunSharp
         /// <returns>Res[T]</returns>
         public Res<T> Then<T>(Func<TValue, T> function)
         {
-            if (IsError) return error;
-
-            var val = value.GetValueOrElse(default);
-            return IsSome ? Try(() => function(val)) : None.Instance;
+            if (IsError) 
+                return error;
+            else if (IsSome)
+            {
+                try
+                {
+                    return function(value.GetValue());
+                }
+                catch (Exception ex)
+                {
+                    return new Error(ex, ex.Message);
+                }
+            }
+            else
+                return None.Instance;
         }
 
         /// <summary>
@@ -107,18 +170,99 @@ namespace FunSharp
         {
             if (IsError)
                 return error;
-            else
-                return IsSome ? function(value.GetValueOrElse(default)) : None.Instance;
+            else if (IsSome)
+            {
+                try
+                {
+                    return function(value.GetValue());
+                }
+                catch (Exception ex)
+                {
+                    return new Error(ex, ex.Message);
+                }
+            }
+            return None.Instance;
         }
 
         /// <summary>
-        /// Executa a action e retorna Unit.
+        /// Executa a função e retorna o resultado.
         /// Possibilita o encadeamento de execuções.
         /// </summary>
-        /// <param name="action">Action a ser executada</param>
-        /// <returns>Res[Unit]</returns>
-        public Res<Unit> Then(Action<TValue> action)
-            => Then(FunSharpUtils.ToFunc(action));
+        /// <param name="function">Função a ser executada</param>
+        /// <returns>Res</returns>
+        public Res Then(Action<TValue> function)
+        {
+            if (IsError)
+                return error;
+            else
+            {
+                try
+                {
+                    function(value.GetValue());
+                    return Res.Success();
+                }
+                catch (Exception ex)
+                {
+                    return new Error(ex, ex.Message);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executa a função e retorna o resultado.
+        /// Possibilita o encadeamento de execuções.
+        /// </summary>
+        /// <param name="function">Função a ser executada</param>
+        /// <returns>Res</returns>
+        public Res Then(Action function)
+        {
+            if (IsError)
+                return error;
+            else
+            {
+                try
+                {
+                    function();
+                    return Res.Success();
+                }
+                catch (Exception ex)
+                {
+                    return new Error(ex, ex.Message);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executa a função e retorna o resultado.
+        /// Possibilita o encadeamento de execuções.
+        /// </summary>
+        /// <typeparam name="T">Tipo do valor de retorno</typeparam>
+        /// <param name="function">Função assíncrona a ser executada</param>
+        /// <returns>Task[Res[T]]</returns>
+        public async Task<Res<T>> ThenAsync<T>(Func<TValue, Task<T>> function)
+        {
+            if (IsError) return error;
+
+            var val = value.GetValueOrElse(default);
+
+            return IsSome ? await TryAsync(() => function(val), errFunction: null) : None.Instance;
+        }
+
+        /// <summary>
+        /// Executa a função e retorna o resultado.
+        /// Possibilita o encadeamento de execuções.
+        /// </summary>
+        /// <typeparam name="T">Tipo do valor de retorno</typeparam>
+        /// <param name="function">Função assíncrona a ser executada</param>
+        /// <returns>Task[Res[T]]</returns>
+        public async Task<Res<T>> ThenAsync<T>(Func<TValue, Task<Res<T>>> function)
+        {
+            if (IsError)
+                return error;
+            else
+                return IsSome ? await function(value.GetValueOrElse(default)) : None.Instance;
+        }
+
 
         /// <summary>
         /// Se condition for true, executa a função isTrue, senão, executa isFalse.
@@ -142,16 +286,16 @@ namespace FunSharp
         public Res<T> IfThen<T>(Predicate<TValue> condition, Func<TValue, Res<T>> isTrue, Func<TValue, Res<T>> isFalse)
             => condition(value.GetValue()) ? Then(isTrue) : Then(isFalse);
 
-        /// <summary>
-        /// Se condition for true, executa a função isTrue, senão, executa isFalse.
-        /// </summary>
-        /// <typeparam name="T">Tipo do valor de retorno</typeparam>
-        /// <param name="condition">Função de condição (predicado)</param>
-        /// <param name="isTrue">Função a ser executada se condition = true</param>
-        /// <param name="isFalse">Função a ser executada se condition = false</param>
-        /// <returns>Res[Unit]</returns>
-        public Res<Unit> IfThen(Predicate<TValue> condition, Action<TValue> isTrue, Action<TValue> isFalse)
-            => condition(value.GetValue()) ? Then(isTrue) : Then(isFalse);
+        /////// <summary>
+        /////// Se condition for true, executa a função isTrue, senão, executa isFalse.
+        /////// </summary>
+        /////// <typeparam name="T">Tipo do valor de retorno</typeparam>
+        /////// <param name="condition">Função de condição (predicado)</param>
+        /////// <param name="isTrue">Função a ser executada se condition = true</param>
+        /////// <param name="isFalse">Função a ser executada se condition = false</param>
+        /////// <returns>Res[Unit]</returns>
+        ////public Res<Unit> IfThen(Predicate<TValue> condition, Action<TValue> isTrue, Action<TValue> isFalse)
+        ////    => condition(value.GetValue()) ? Then(isTrue) : Then(isFalse);
 
         /// <summary>
         /// Se condition for true, executa a função isTrue, senão, executa isFalse.
@@ -175,29 +319,29 @@ namespace FunSharp
         public Res<T> IfThen<T>(bool condition, Func<TValue, Res<T>> isTrue, Func<TValue, Res<T>> isFalse)
             => condition ? Then(isTrue) : Then(isFalse);
 
-        /// <summary>
-        /// Se condition for true, executa a função isTrue, senão, executa isFalse.
-        /// </summary>
-        /// <typeparam name="T">Tipo do valor de retorno</typeparam>
-        /// <param name="condition">Condição</param>
-        /// <param name="isTrue">Função a ser executada se condition = true</param>
-        /// <param name="isFalse">Função a ser executada se condition = false</param>
-        /// <returns>Res[Unit]</returns>
-        public Res<Unit> IfThen(bool condition, Action<TValue> isTrue, Action<TValue> isFalse)
-            => condition ? Then(isTrue) : Then(isFalse);
+        /////// <summary>
+        /////// Se condition for true, executa a função isTrue, senão, executa isFalse.
+        /////// </summary>
+        /////// <typeparam name="T">Tipo do valor de retorno</typeparam>
+        /////// <param name="condition">Condição</param>
+        /////// <param name="isTrue">Função a ser executada se condition = true</param>
+        /////// <param name="isFalse">Função a ser executada se condition = false</param>
+        /////// <returns>Res[Unit]</returns>
+        ////public Res<Unit> IfThen(bool condition, Action<TValue> isTrue, Action<TValue> isFalse)
+        ////    => condition ? Then(isTrue) : Then(isFalse);
 
-        /// <summary>
-        /// Intercepta um fluxo com erro.
-        /// </summary>
-        /// <param name="action">Função a ser executada no caso de erro.</param>
-        /// <returns>Res[TValue]</returns>
-        public Res<TValue> Fail(Action<Error> action)
-        {
-            if (!IsError)
-                return value;
-
-            return Try(ToFunc(action));
-        }
+        /////// <summary>
+        /////// Intercepta um fluxo com erro.
+        /////// </summary>
+        /////// <param name="action">Função a ser executada no caso de erro.</param>
+        /////// <returns>Res[TValue]</returns>
+        ////public Res<TValue> Fail(Action<Error> action)
+        ////{
+        ////    if (!IsError)
+        ////        return value;
+            
+        ////    return Try(ToFunc(action));
+        ////}
 
         /// <summary>
         /// Converte Res[T] para uma tupla (Error, T)
@@ -210,12 +354,13 @@ namespace FunSharp
             value = this.value.GetValue();
         }
 
+        /// <summary>
+        /// Converte Res[T] em Res (despreza retorno de valor).
+        /// </summary>
+        /// <returns>Res</returns>
+        public Res ToRes()
+            => IsError ? Res.Error(error) : Res.Success();
 
-        private Func<Error> ToFunc(Action<Error> action)
-        {
-            var e = error;
-            return () => { action(e); return e; };
-        }
 
         /// <summary>
         /// Operador de cast implícito para sucesso.
@@ -256,7 +401,7 @@ namespace FunSharp
     /// <summary>
     /// Resultado de uma computação sem retorno de valor, indicando apenas sucesso ou falha.
     /// </summary>
-    public class Res
+    public struct Res
     {
         private readonly Error error;
 
@@ -267,8 +412,11 @@ namespace FunSharp
         /// <summary>
         /// Construtor para execuções bem-sucedidas.
         /// </summary>
-        internal Res()
-            => IsError = false;
+        internal Res(bool _)
+        {
+            error = null;
+            IsError = false;
+        }
 
         /// <summary>
         /// Construtor para execuções com erro.
@@ -277,6 +425,58 @@ namespace FunSharp
         {
             this.error = error;
             IsError = true;
+        }
+
+        /// <summary>
+        /// Em caso de erro, executa a função passada.
+        /// </summary>
+        /// <param name="function">Função a ser executada em caso de erro</param>
+        /// <returns>Instância atual</returns>
+        public Res OnError(Action<Error> function)
+        {
+            if (IsError)
+                function(error);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Em caso de sucesso, executa a função passada.
+        /// </summary>
+        /// <param name="function">Função a ser executada em caso de sucesso</param>
+        /// <returns>Instância atual</returns>
+        public Res OnSuccess(Action function)
+        {
+            if (IsSuccess)
+                function();
+
+            return this;
+        }
+
+        /// <summary>
+        /// Retorna o Res passado, se não houver erro no Res atual.
+        /// </summary>
+        /// <param name="res">Novo resultado</param>
+        /// <returns>Res</returns>
+        public Res Combine(Res res)
+        {
+            if (IsError)
+                return error;
+
+            return res;
+        }
+
+        /// <summary>
+        /// Retorna o Res[T] passado, se não houver erro no Res atual.
+        /// </summary>
+        /// <param name="res">Novo resultado</param>
+        /// <returns>Res[T]</returns>
+        public Res<T> Combine<T>(Res<T> res)
+        {
+            if (IsError)
+                return error;
+
+            return res;
         }
 
         /// <summary>
@@ -293,7 +493,7 @@ namespace FunSharp
         /// Resultado bem-sucedido de uma execução.
         /// </summary>
         /// <returns>Res</returns>
-        public static Res Success() => new Res();
+        public static Res Success() => new Res(true);
 
         /// <summary>
         /// Resultado de uma execução com erro.

@@ -1,7 +1,9 @@
-﻿using NUnit.Framework;
+﻿using FunSharp.Tests.Utils;
+using NUnit.Framework;
 using Shouldly;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace FunSharp.Tests
 {
@@ -29,44 +31,32 @@ namespace FunSharp.Tests
         }
 
 
-        [Test]
-        public void Deve_Ser_Unit_Apos_Then()
-        {
-            var res = Res.Of(500)
-                         .Then(n => Debug.WriteLine("text"));
+        ////[Test]
+        ////public void Deve_Ser_Unit_Apos_Then()
+        ////{
+        ////    var res = Res.Of(500)
+        ////                 .Then(n => Debug.WriteLine("text"));
 
-            res.IsSome.ShouldBeTrue();
-            res.IsError.ShouldBeFalse();
-            res.IsNone.ShouldBeFalse();
+        ////    res.IsSome.ShouldBeTrue();
+        ////    res.IsError.ShouldBeFalse();
+        ////    res.IsNone.ShouldBeFalse();
 
-            var value = res.Match(
-                            some: v => v.GetType().Name,
-                            error: e => e.GetType().Name,
-                            none: _ => "None"
-                        );
+        ////    var value = res.Match(
+        ////                    some: v => v.GetType().Name,
+        ////                    error: e => e.GetType().Name,
+        ////                    none: _ => "None"
+        ////                );
 
-            value.ShouldBe("Unit");
-        }
+        ////    value.ShouldBe("Unit");
+        ////}
 
-        [Test]
-        public void Deve_Ser_String_Apos_Unit()
-        {
-            var res = Res.Of(500)
-                         .Then(n => Debug.WriteLine("text"))
-                         .Then(u => u.GetType().Name);
-
-            res.IsSome.ShouldBeTrue();
-            res.IsError.ShouldBeFalse();
-            res.IsNone.ShouldBeFalse();
-
-            var value = res.GetValueOrElse("");
-            value.ShouldBe("Unit");
-        }
+        public async Task<string> Processa(int n)
+            => await Task.FromResult(n.ToString());
 
         [Test]
         public void Deve_Ter_Valor_Do_Ultimo_Then()
         {
-            var res = Res.Of(new Teste())
+            var res = Res.Of(new TesteClass() { Id = 20 })
                          .Then(t => t.Soma(10, 20))
                          .Then(n => n * 300D)
                          .Then(d => Convert.ToDecimal(d))

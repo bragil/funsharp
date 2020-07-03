@@ -3,22 +3,41 @@
 namespace FunSharp
 {
     /// <summary>
-    /// Valor opcional
+    /// Envolve um possível valor que pode existir ou não. 
     /// </summary>
-    /// <typeparam name="TValue"></typeparam>
+    /// <typeparam name="TValue">Tipo do valor</typeparam>
     public class Opt<TValue>
     {
+        /// <summary>
+        /// O valor
+        /// </summary>
         private TValue Value { get; set; }
+
+        /// <summary>
+        /// Se existir valor será true;
+        /// </summary>
         public bool IsSome { get; }
+
+        /// <summary>
+        /// Se não existir valor será true.
+        /// </summary>
         public bool IsNone { get; }
 
+        /// <summary>
+        /// Construtor, recebe o valor.
+        /// </summary>
+        /// <param name="some">Valor</param>
         public Opt(TValue some)
         {
             Value = some;
-            IsNone = Value == null || (Value.Equals(default(TValue)) && Value.GetType() != typeof(Unit));
+            IsNone = Value == null || Value.Equals(default(TValue));
             IsSome = !IsNone;
         }
 
+        /// <summary>
+        /// Construtor para ausência de valor (None).
+        /// </summary>
+        /// <param name="_"></param>
         public Opt(None _)
         {
             Value = default;
@@ -26,6 +45,10 @@ namespace FunSharp
             IsSome = false;
         }
 
+        /// <summary>
+        /// Retorna o valor, se houver.
+        /// </summary>
+        /// <returns>Valor</returns>
         internal TValue GetValue()
             => Value;
 
@@ -38,6 +61,32 @@ namespace FunSharp
             => IsNone ? fallback : Value;
 
         /// <summary>
+        /// Caso haja valor, executa a função passada. Retorna a instância do objeto Opt atual.
+        /// </summary>
+        /// <param name="action">Função a ser executada caso haja valor</param>
+        /// <returns>Opt[TValue]</returns>
+        public Opt<TValue> OnSome(Action<TValue> action)
+        {
+            if (IsSome)
+                action(Value);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Caso não haja valor (None), executa a função passada. Retorna a instância do objeto Opt atual.
+        /// </summary>
+        /// <param name="action">Função a ser executada caso não haja valor (None)</param>
+        /// <returns>Opt[TValue]</returns>
+        public Opt<TValue> OnNone(Action action)
+        {
+            if (IsNone)
+                action();
+
+            return this;
+        }
+
+        /// <summary>
         /// Pattern matching do resultado, possibilita obter o valor.
         /// </summary>
         /// <typeparam name="T">Tipo de retorno</typeparam>
@@ -45,10 +94,34 @@ namespace FunSharp
         /// <param name="none">Função a ser executada em execuções bem-sucedidas que não retornam valor.</param>
         /// <returns>T</returns>
         public T Match<T>(Func<TValue, T> some, Func<None, T> none = null)
-            => IsSome 
-                ? some(Value) 
-                : none(None.Instance);
+        {
+            if (IsSome)
+                return some(Value);
+            else
+                return none != null ? none(None.Instance) : default;
+        }
 
+        /// <summary>
+        /// Aplica uma função sobre o valor e retorna um Opt do novo valor.
+        /// </summary>
+        /// <typeparam name="T">Tipo do novo valor</typeparam>
+        /// <param name="function">Função</param>
+        /// <returns>Opt do novo valor</returns>
+        public Opt<T> Then<T>(Func<TValue, T> function)
+        => IsSome
+            ? function(Value)
+            : default;
+
+        /// <summary>
+        /// Aplica uma função sobre o valor e retorna um Opt do novo valor.
+        /// </summary>
+        /// <typeparam name="T">Tipo do novo valor</typeparam>
+        /// <param name="function">Função</param>
+        /// <returns>Opt do novo valor</returns>
+        public Opt<T> Then<T>(Func<TValue, Opt<T>> function)
+            => IsSome
+                ? function(Value)
+                : default;
 
         /// <summary>
         /// Operador de cast implícito para valor (Some).
@@ -65,11 +138,22 @@ namespace FunSharp
             => new Opt<TValue>(None.Instance);
     }
 
-    public class Opt
+    public static class Opt
     {
+        /// <summary>
+        /// Envolve um valor em um Opt.
+        /// </summary>
+        /// <typeparam name="T">Tipo do valor</typeparam>
+        /// <param name="value">Valor</param>
+        /// <returns>Opt[T]</returns>
         public static Opt<T> Of<T>(T value)
             => new Opt<T>(value);
 
+        /// <summary>
+        /// Retorna um None
+        /// </summary>
+        /// <typeparam name="T">Tipo do valor</typeparam>
+        /// <returns>None</returns>
         public static Opt<T> Empty<T>()
             => new Opt<T>(None.Instance);
     }
