@@ -17,40 +17,41 @@ public Pessoa ObterPessoa(int id)
     }
 }
 
-// Consumindo o método acima:
+// Consumindo o método acima, não há como saber se o resultado é o esperado ou não ou se houve algum erro. 
+// Se o desenvolvedor não verificar o valor retornado, podem ocorrer erros como NullReferenceException.
 var pessoa = ObterPessoa(id);
-if (pessoa == null)
-{
-   // lógica para null
-}
-else
-{
-   // lógica para diferente de null
-}
 ```
 
-Com FunSharp, você faz assim:
+Com FunSharp, basta você envolver o tipo de retorno em um tipo Res<T>. No caso abaixo, Res<Pessoa>, ou seja, o resultado da obtenção do objeto Pessoa:
 
 ```csharp
-using static FunSharp.TryFunctions;
-
 public Res<Pessoa> ObterPessoa(int id)
-    => Try(() => repository.ObterPessoa(id), "Erro ao obter pessoa.");
+{
+    try
+    {
+        return repository.ObterPessoa(id);
+    }
+    catch(Exception ex)
+    {
+        return new Error(ex, "Erro ao obter os dados da pessoa.");
+    }
+}
 
-// Consumindo o método acima:
-ObterPessoa(id)
-  .Match(
-      some: p => 
-      {
-         // lógica para quando há retorno de valor.
-      },
-      error: err =>
-      {
-         // Tratamento do erro (mensagens, log, etc)
-      },
-      none: _ =>
-      {
-         // Lógica para quando não retorna valor (nulo).
-      }
-  );
+// Ao consumir o método acima, você pode ter uma lógica para cada situação através de pattern matching:
+//   - retorno de valor (some);
+//   - não retorno de valor (none);
+//   - erro (error);
+
+// O código abaixo mostra como consumir o método em um Controller Asp.Net Core Web API:
+
+public IActionResult Get(int id)
+{
+    return ObterPessoa(id)
+      .Match(
+          some: pessoa => Ok(pessoa),
+          none: _ => NoContent(),
+          error: err => BadRequest(err.Message)
+      );
+
+}
 ```
