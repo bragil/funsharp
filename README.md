@@ -44,7 +44,7 @@ No caso acima, podem ocorrer 2 situações:
 
 E caso o valor seja **NULL**, pode ter sido por não existir no banco de dados **OU** por ter ocorrido uma `Exception`.
 
-**FunSharp** oferece uma interface fluída para que possamos tratar estas questões de uma forma muito simples, usando o *pattern* (**Monad**)[https://mikhail.io/2018/07/monads-explained-in-csharp-again/]. Reescrevendo o método acima, basta você envolver o tipo de retorno em um tipo `Res<T>`, no caso, `Res<Pessoa>`, ou seja, o resultado da obtenção do objeto `Pessoa`:
+**FunSharp** oferece uma interface fluída para que possamos tratar estas questões de uma forma muito simples, usando o *pattern* (Monad)[https://mikhail.io/2018/07/monads-explained-in-csharp-again/]. Reescrevendo o método acima, basta você envolver o tipo de retorno em um tipo `Res<T>`, no caso, `Res<Pessoa>`, ou seja, o resultado da obtenção do objeto `Pessoa`:
 
 ```csharp
 public Res<Pessoa> ObterPessoa(int id)
