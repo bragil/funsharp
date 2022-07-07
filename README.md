@@ -2,7 +2,12 @@
 
 FunSharp oferece uma abordagem funcional para o tratamento de erros em .Net, através de *RailWay Oriented Programming*. 
 
-Primeiro, vamos ver como o que fazemos sem o FunSharp, e como ele pode nos ajudar.
+[1. Motivação](#motivacao)
+[2. Instalação](#instalacao)
+
+# Motivação
+
+Primeiro, vamos ver como fazemos **sem o FunSharp**, e como ele pode nos ajudar.
 
 Segue abaixo o exemplo de um método muito comum em qualquer projeto, a obtenção de dados de um repositório:
 
@@ -19,7 +24,7 @@ public Pessoa ObterPessoa(int id)
     }
 }
 ```
-Consumindo o método acima, não há como saber se o resultado é o esperado ou não ou se houve algum erro. Se o desenvolvedor não verificar o valor retornado, podem ocorrer erros como `NullReferenceException`.
+Consumindo o método acima, não há como saber se o resultado é o esperado ou não, ou se houve algum erro. Se o desenvolvedor não verificar o valor retornado, podem ocorrer erros como `NullReferenceException`.
 
 ```csharp
 var pessoa = ObterPessoa(id);
@@ -60,3 +65,15 @@ public IActionResult Get(int id)
 
 }
 ```
+
+# Instalação
+
+## Visual Studio
+
+No **Package Manager Console** (Visual Studio) digite `Install-Package FunSharp` e tecle Enter.
+
+Ou clique com o botão direito do mouse sobre o projeto onde será instalado o **FunSharp** (ou sobre a Solution), depois clique na opção **Manage NuGet Packages...**. Na aba **Browse**, digite no campo de pesquisa **FunSharp** e tecle Enter. Na listagem, clique sobre o **FunSharp** e no painel lateral direito clique no botão **Install**.
+
+## CLI
+
+Dentro da pasta do projeto onde o **FunSharp** será instalado, digite `dotnet add package FunSharp`.
