@@ -16,9 +16,10 @@ public Pessoa ObterPessoa(int id)
        return null;
     }
 }
+```
+Consumindo o método acima, não há como saber se o resultado é o esperado ou não ou se houve algum erro. Se o desenvolvedor não verificar o valor retornado, podem ocorrer erros como `NullReferenceException`.
 
-// Consumindo o método acima, não há como saber se o resultado é o esperado ou não ou se houve algum erro. 
-// Se o desenvolvedor não verificar o valor retornado, podem ocorrer erros como NullReferenceException.
+```csharp
 var pessoa = ObterPessoa(id);
 ```
 
@@ -36,14 +37,16 @@ public Res<Pessoa> ObterPessoa(int id)
         return new Error(ex, "Erro ao obter os dados da pessoa.");
     }
 }
+```
 
-// Ao consumir o método acima, você pode ter uma lógica para cada situação através de pattern matching:
-//   - retorno de valor (some);
-//   - não retorno de valor (none);
-//   - erro (error);
+Ao consumir o método acima, você pode ter uma lógica para cada situação através de pattern matching:
+- Retorno de valor (some);
+- Não retorno de valor (none);
+- Rrro (error);
 
-// O código abaixo mostra como consumir o método em um Action de um Controller Asp.Net Core Web API:
+O código abaixo mostra como consumir o método em um Action de um Controller Asp.Net Core Web API:
 
+```csharp
 public IActionResult Get(int id)
 {
     return ObterPessoa(id)
