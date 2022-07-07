@@ -22,7 +22,7 @@ public Pessoa ObterPessoa(int id)
 var pessoa = ObterPessoa(id);
 ```
 
-Com FunSharp, basta você envolver o tipo de retorno em um tipo Res<T>. No caso abaixo, Res<Pessoa>, ou seja, o resultado da obtenção do objeto Pessoa:
+Com FunSharp, basta você envolver o tipo de retorno em um tipo `Res<T>`. No caso abaixo, `Res<Pessoa>`, ou seja, o resultado da obtenção do objeto `Pessoa`:
 
 ```csharp
 public Res<Pessoa> ObterPessoa(int id)
@@ -42,14 +42,14 @@ public Res<Pessoa> ObterPessoa(int id)
 //   - não retorno de valor (none);
 //   - erro (error);
 
-// O código abaixo mostra como consumir o método em um Controller Asp.Net Core Web API:
+// O código abaixo mostra como consumir o método em um Action de um Controller Asp.Net Core Web API:
 
 public IActionResult Get(int id)
 {
     return ObterPessoa(id)
       .Match(
           some: pessoa => Ok(pessoa),
-          none: _ => NoContent(),
+          none: _ => NotFound(),
           error: err => BadRequest(err.Message)
       );
 
