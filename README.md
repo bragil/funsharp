@@ -97,3 +97,7 @@ Ou clique com o botão direito do mouse sobre o projeto onde será instalado o *
 ## CLI
 
 Dentro da pasta do projeto onde o **FunSharp** será instalado, digite `dotnet add package FunSharp`.
+
+# Resultados - Res e Res\<T\>
+
+bla bla bla
