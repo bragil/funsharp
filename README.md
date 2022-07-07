@@ -2,7 +2,9 @@
 
 FunSharp oferece uma abordagem funcional para o tratamento de erros em .Net, através de *RailWay Oriented Programming*. 
 
-Ao invés de:
+Primeiro, vamos ver como o que fazemos sem o FunSharp, e como ele pode nos ajudar.
+
+Segue abaixo o exemplo de um método muito comum em qualquer projeto, a obtenção de dados de um repositório:
 
 ```csharp
 public Pessoa ObterPessoa(int id)
