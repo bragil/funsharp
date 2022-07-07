@@ -1,13 +1,12 @@
 # FunSharp
 
-FunSharp oferece uma abordagem funcional para o tratamento de erros e valores nulos em .Net, através de *RailWay Oriented Programming*. 
+**FunSharp** oferece uma abordagem funcional para o tratamento de erros e valores nulos em .Net, através de *RailWay Oriented Programming*. 
 
 Primeiro, vamos ver como fazemos **sem o FunSharp**, e como ele pode nos ajudar.
 
 Segue abaixo o exemplo de um método muito comum em qualquer projeto, a obtenção de dados de um repositório:
 
 ```csharp
-
 public class PessoaService
 {
     // Demais implementações da classe ...
@@ -87,5 +86,5 @@ Ou clique com o botão direito do mouse sobre o projeto onde será instalado o *
 
 Dentro da pasta do projeto onde o **FunSharp** será instalado, digite `dotnet add package FunSharp`.
 
-**FunSharp** oferece muito mais recursos, como tipos opcionais (Opt\<T\>), extensões para Nullable e Tasks, dentre outros. Consulte a [wiki](https://github.com/bragil/funsharp/wiki).
+**FunSharp** oferece muito mais recursos, como tipos opcionais (Opt\<T\>), extensões para **Nullable** e **Task**, dentre outros. Consulte a [wiki](https://github.com/bragil/funsharp/wiki).
 
