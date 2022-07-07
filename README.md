@@ -5,7 +5,9 @@ FunSharp oferece uma abordagem funcional para o tratamento de erros e valores nu
 # Índice
 
 [1. Motivação](#motivação)\
-[2. Instalação](#instalação)
+[2. Instalação](#instalação)\
+[3. Resultados - Res e Res\<T\>](#resultados)
+
 
 # Motivação
 
@@ -90,7 +92,7 @@ Este é apenas um dos inúmeros recursos de **FunSharp**.
 
 No **Package Manager Console** (Visual Studio) digite `Install-Package FunSharp` e tecle Enter.
 
-Ou clique com o botão direito do mouse sobre o projeto onde será instalado o **FunSharp** (ou sobre a Solution), depois clique na opção **Manage NuGet Packages...**. Na aba **Browse**, digite no campo de pesquisa **FunSharp** e tecle Enter. Na listagem, clique sobre o **FunSharp** e no painel lateral direito clique no botão **Install**.
+Ou clique com o botão direito do mouse sobre o projeto onde será instalado o **FunSharp** (ou sobre a Solution), depois clique na opção **Manage NuGet Packages...**. Na aba **Browse**, digite **FunSharp** no campo de pesquisa e tecle Enter. Na listagem, clique sobre o **FunSharp** e no painel lateral direito clique no botão **Install**.
 
 ## CLI
 
