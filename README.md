@@ -2,15 +2,6 @@
 
 FunSharp oferece uma abordagem funcional para o tratamento de erros e valores nulos em .Net, através de *RailWay Oriented Programming*. 
 
-# Índice
-
-[1. Motivação](#motivação)\
-[2. Instalação](#instalação)\
-[3. Resultados - Res e Res\<T\>](#resultados)
-
-
-# Motivação
-
 Primeiro, vamos ver como fazemos **sem o FunSharp**, e como ele pode nos ajudar.
 
 Segue abaixo o exemplo de um método muito comum em qualquer projeto, a obtenção de dados de um repositório:
@@ -84,8 +75,6 @@ public IActionResult Get(int id)
 ```
 Veja que o método `Match` retornou o objeto `IActionResult` mais adequado para cada situação, sem o uso de `if .. else`, sem o uso de `switch`, de forma bastante simplificada e elegante. 
 
-Este é apenas um dos inúmeros recursos de **FunSharp**.
-
 # Instalação
 
 ## Visual Studio
@@ -98,6 +87,5 @@ Ou clique com o botão direito do mouse sobre o projeto onde será instalado o *
 
 Dentro da pasta do projeto onde o **FunSharp** será instalado, digite `dotnet add package FunSharp`.
 
-# Resultados - Res e Res\<T\>
+**FunSharp** oferece muito mais recursos, como tipos opcionais (Opt\<T\>), extensões para Nullable e Tasks, dentre outros. Consulte a [wiki](https://github.com/bragil/funsharp/wiki).
 
-bla bla bla
