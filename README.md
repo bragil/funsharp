@@ -1,6 +1,6 @@
 # FunSharp
 
-**FunSharp** oferece uma abordagem funcional para o tratamento de erros e valores nulos em .Net, através de *RailWay Oriented Programming*. 
+**FunSharp** oferece uma abordagem funcional para o tratamento de erros e valores nulos em .Net, através de [*RailWay Oriented Programming*](https://fsharpforfunandprofit.com/rop/). 
 
 Primeiro, vamos ver como fazemos **sem o FunSharp**, e como ele pode nos ajudar.
 
