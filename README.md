@@ -31,8 +31,13 @@ Consumindo o método acima, não há como saber se o resultado é o esperado ou 
 ```csharp
 var pessoa = ObterPessoa(id);
 ```
+No caso acima, podem ocorrer 2 situações:
+- O objeto Pessoa é retornado com os dados da pessoa;
+- O objeto Pessoa é retornado com o valor NULL.
 
-Com FunSharp, basta você envolver o tipo de retorno em um tipo `Res<T>`. No caso abaixo, `Res<Pessoa>`, ou seja, o resultado da obtenção do objeto `Pessoa`:
+E caso o valor seja NULL, pode ter sido por não existir no banco de dados ou por ter ocorrido uma `Exception`.
+
+FunSharp oferece uma interface fluída para que possamos tratar estas questões de uma forma muito simples, usando o *pattern* **Monad**. Reescrevendo o método acima, basta você envolver o tipo de retorno em um tipo `Res<T>`, no caso, `Res<Pessoa>`, ou seja, o resultado da obtenção do objeto `Pessoa`:
 
 ```csharp
 public Res<Pessoa> ObterPessoa(int id)
@@ -47,19 +52,20 @@ public Res<Pessoa> ObterPessoa(int id)
     }
 }
 ```
+Se ocorrer uma Exception, basta retornar um objeto `Error`, ele será convertido para o tipo `Res<Pessoa>`.
 
-Ao consumir o método acima, você pode ter uma lógica para cada situação através de pattern matching:
+Ao consumir o método acima, você pode ter uma lógica para cada situação através de *pattern matching*:
 - Retorno de valor (some);
 - Não retorno de valor (none);
-- Rrro (error);
+- Erro (error);
 
-O código abaixo mostra como consumir o método em um Action de um Controller Asp.Net Core Web API:
+O código abaixo mostra como consumir o método em um Action de um Controller **Asp.Net Core Web API**:
 
 ```csharp
 public IActionResult Get(int id)
 {
     return ObterPessoa(id)
-      .Match(
+      .Match<IActionResult>(
           some: pessoa => Ok(pessoa),
           none: _ => NotFound(),
           error: err => BadRequest(err.Message)
@@ -67,6 +73,7 @@ public IActionResult Get(int id)
 
 }
 ```
+Veja que o método `Match` retornou o objeto `IActionResult` mais adequado para cada situação.
 
 # Instalação
 
