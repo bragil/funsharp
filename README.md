@@ -1,6 +1,6 @@
 # FunSharp
 
-FunSharp oferece uma abordagem funcional para o tratamento de erros em .Net, através de *RailWay Oriented Programming*. 
+FunSharp oferece uma abordagem funcional para o tratamento de erros e valores nulos em .Net, através de *RailWay Oriented Programming*. 
 
 # Índice
 
@@ -14,30 +14,37 @@ Primeiro, vamos ver como fazemos **sem o FunSharp**, e como ele pode nos ajudar.
 Segue abaixo o exemplo de um método muito comum em qualquer projeto, a obtenção de dados de um repositório:
 
 ```csharp
-public Pessoa ObterPessoa(int id)
+
+public class PessoaService
 {
-    try
+    // Demais implementações da classe ...
+
+
+    public Pessoa ObterPessoa(int id)
     {
-        return repository.ObterPessoa(id);
-    }
-    catch(Exception ex)
-    {
-       return null;
+        try
+        {
+            return repository.ObterPessoa(id);
+        }
+        catch(Exception ex)
+        {
+           return null;
+        }
     }
 }
 ```
 Consumindo o método acima, não há como saber se o resultado é o esperado ou não, ou se houve algum erro. Se o desenvolvedor não verificar o valor retornado, podem ocorrer erros como `NullReferenceException`.
 
 ```csharp
-var pessoa = ObterPessoa(id);
+var pessoa = pessoaService.ObterPessoa(id);
 ```
 No caso acima, podem ocorrer 2 situações:
 - O objeto Pessoa é retornado com os dados da pessoa;
 - O objeto Pessoa é retornado com o valor NULL.
 
-E caso o valor seja NULL, pode ter sido por não existir no banco de dados ou por ter ocorrido uma `Exception`.
+E caso o valor seja **NULL**, pode ter sido por não existir no banco de dados **OU** por ter ocorrido uma `Exception`.
 
-FunSharp oferece uma interface fluída para que possamos tratar estas questões de uma forma muito simples, usando o *pattern* **Monad**. Reescrevendo o método acima, basta você envolver o tipo de retorno em um tipo `Res<T>`, no caso, `Res<Pessoa>`, ou seja, o resultado da obtenção do objeto `Pessoa`:
+**FunSharp** oferece uma interface fluída para que possamos tratar estas questões de uma forma muito simples, usando o *pattern* **Monad**. Reescrevendo o método acima, basta você envolver o tipo de retorno em um tipo `Res<T>`, no caso, `Res<Pessoa>`, ou seja, o resultado da obtenção do objeto `Pessoa`:
 
 ```csharp
 public Res<Pessoa> ObterPessoa(int id)
@@ -64,16 +71,18 @@ O código abaixo mostra como consumir o método em um Action de um Controller **
 ```csharp
 public IActionResult Get(int id)
 {
-    return ObterPessoa(id)
-      .Match<IActionResult>(
-          some: pessoa => Ok(pessoa),
-          none: _ => NotFound(),
-          error: err => BadRequest(err.Message)
-      );
+    return pessoaService.ObterPessoa(id)
+              .Match<IActionResult>(
+                  some: pessoa => Ok(pessoa),
+                  none: _ =>      NotFound(),
+                  error: err =>   BadRequest(err.Message)
+              );
 
 }
 ```
-Veja que o método `Match` retornou o objeto `IActionResult` mais adequado para cada situação.
+Veja que o método `Match` retornou o objeto `IActionResult` mais adequado para cada situação, sem o uso de `if .. else`, sem o uso de `switch`, de forma bastante simplificada e elegante. 
+
+Este é apenas um dos inúmeros recursos de **FunSharp**.
 
 # Instalação
 
