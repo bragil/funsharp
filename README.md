@@ -2,8 +2,10 @@
 
 FunSharp oferece uma abordagem funcional para o tratamento de erros em .Net, através de *RailWay Oriented Programming*. 
 
+# Índice
+
 [1. Motivação](#motivação)\
-[2. Instalação](#instalação)\
+[2. Instalação](#instalação)
 
 # Motivação
 
