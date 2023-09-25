@@ -86,5 +86,5 @@ Ou clique com o botão direito do mouse sobre o projeto onde será instalado o *
 
 Dentro da pasta do projeto onde o **FunSharp** será instalado, digite `dotnet add package FunSharp`.
 
-**FunSharp** oferece muito mais recursos, como tipos opcionais (Opt\<T\>), extensões para **Nullable** e **Task**, dentre outros. Consulte a [wiki](https://github.com/bragil/funsharp/wiki).
+**FunSharp** oferece muito mais recursos, como o tipo MayBe (MayBe\<T\>), extensões para **Nullable** e **Task**, dentre outros. Consulte a [wiki](https://github.com/bragil/funsharp/wiki).
 
