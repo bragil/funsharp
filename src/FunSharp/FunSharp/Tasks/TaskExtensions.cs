@@ -3,6 +3,57 @@
 public static class TaskExtensions
 {
     /// <summary>
+    /// Intercept the result in case of error.
+    /// </summary>
+    /// <typeparam name="T">Value type</typeparam>
+    /// <param name="source">Source task</param>
+    /// <param name="errorFunction">Error function</param>
+    /// <returns><![CDATA[Task<Result<T>>]]></returns>
+    public async static Task<Result<T>> OnError<T>(this Task<Result<T>> source, 
+                                                   Action<Error> errorFunction)
+    {
+        var result = await source;
+        if (result.HasError)
+            errorFunction(result.GetError());
+
+        return result;
+    }
+
+    /// <summary>
+    /// Intercept the result in case of some value.
+    /// </summary>
+    /// <typeparam name="T">Value type</typeparam>
+    /// <param name="source">Source task</param>
+    /// <param name="valueFunction">Value function</param>
+    /// <returns><![CDATA[Task<Result<T>>]]></returns>
+    public async static Task<Result<T>> OnSomeValue<T>(this Task<Result<T>> source, 
+                                                       Action<T> valueFunction)
+    {
+        var result = await source;
+        if (!result.HasError && result.HasValue)
+            valueFunction(result.GetValue());
+
+        return result;
+    }
+
+    /// <summary>
+    /// Intercept the result in case of none value.
+    /// </summary>
+    /// <typeparam name="T">Value type</typeparam>
+    /// <param name="source">Source task</param>
+    /// <param name="noValueFunction">No value function</param>
+    /// <returns><![CDATA[Task<Result<T>>]]></returns>
+    public async static Task<Result<T>> OnNoneValue<T>(this Task<Result<T>> source, 
+                                                       Action noValueFunction)
+    {
+        var result = await source;
+        if (!result.HasError && !result.HasValue)
+            noValueFunction();
+
+        return result;
+    }
+
+    /// <summary>
     /// <![CDATA[
     /// Chaining a task of Result<T>.
     /// ]]>
@@ -21,6 +72,33 @@ public static class TaskExtensions
                 return res.GetError();
             
             await function(res.GetValueOrElse(default));
+            return Unit.Create();
+        }
+        catch (Exception ex)
+        {
+            return new Error(ex.Message, ex);
+        }
+    }
+
+    /// <summary>
+    /// <![CDATA[
+    /// Chaining a task of Result<T>.
+    /// ]]>
+    /// </summary>
+    /// <typeparam name="TIn">Value type</typeparam>
+    /// <param name="source">Source task</param>
+    /// <param name="function">Function to be applied to the task</param>
+    /// <returns><![CDATA[New task of Result<Unit>]]></returns>
+    public static async Task<Result<Unit>> Then<TIn>(this Task<Result<TIn>> source,
+                                                     Action<TIn> function)
+    {
+        try
+        {
+            var res = await source;
+            if (res.HasError)
+                return res.GetError();
+
+            function(res.GetValueOrElse(default));
             return Unit.Create();
         }
         catch (Exception ex)
@@ -62,12 +140,58 @@ public static class TaskExtensions
     /// <param name="function">Function to be applied to the task</param>
     /// <returns><![CDATA[New task of Result<T>]]></returns>
     public static async Task<Result<TOut>> Then<TIn, TOut>(this Task<Result<TIn>> source,
+                                                           Func<TIn, TOut> function)
+    {
+        try
+        {
+            var res = await source;
+            return res.HasError ? res.GetError() : function(res.GetValueOrElse(default));
+        }
+        catch (Exception ex)
+        {
+            return new Error(ex.Message, ex);
+        }
+    }
+
+    /// <summary>
+    /// <![CDATA[
+    /// Chaining a task of Result<T>.
+    /// ]]>
+    /// </summary>
+    /// <typeparam name="TIn">Value type</typeparam>
+    /// <param name="source">Source task</param>
+    /// <param name="function">Function to be applied to the task</param>
+    /// <returns><![CDATA[New task of Result<T>]]></returns>
+    public static async Task<Result<TOut>> Then<TIn, TOut>(this Task<Result<TIn>> source,
                                                            Func<TIn, Task<Result<TOut>>> function)
     {
         try
         {
             var res = await source;
             return res.HasError ? res.GetError() : await function(res.GetValueOrElse(default));
+        }
+        catch (Exception ex)
+        {
+            return new Error(ex.Message, ex);
+        }
+    }
+
+    /// <summary>
+    /// <![CDATA[
+    /// Chaining a task of Result<T>.
+    /// ]]>
+    /// </summary>
+    /// <typeparam name="TIn">Value type</typeparam>
+    /// <param name="source">Source task</param>
+    /// <param name="function">Function to be applied to the task</param>
+    /// <returns><![CDATA[New task of Result<T>]]></returns>
+    public static async Task<Result<TOut>> Then<TIn, TOut>(this Task<Result<TIn>> source,
+                                                           Func<TIn, Result<TOut>> function)
+    {
+        try
+        {
+            var res = await source;
+            return res.HasError ? res.GetError() : function(res.GetValueOrElse(default));
         }
         catch (Exception ex)
         {

@@ -23,6 +23,12 @@ public class ResultTests
 
         Result<bool> resBool = true;
         resBool.HasValue.ShouldBeTrue();
+
+        Result<Unit> rUnit = Unit.Create();
+        rUnit.Match(u => 1, e => -1).ShouldBe(1);
+
+        Result<Unit> resErrUnit = new Error("error");
+        resErrUnit.Match(u => 1, e => -1).ShouldBe(-1);
     }
 
     [Test]

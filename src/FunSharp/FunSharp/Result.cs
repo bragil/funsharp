@@ -37,6 +37,11 @@ public readonly struct Result<TValue>
     internal Error GetError()
         => error;
 
+    /// <summary>
+    /// Intercept the result in case of error.
+    /// </summary>
+    /// <param name="errorFunction">Error function</param>
+    /// <returns><![CDATA[Result<TValue>]]></returns>
     public Result<TValue> OnError(Action<Error> errorFunction)
     {
         if (HasError)
@@ -45,17 +50,27 @@ public readonly struct Result<TValue>
         return this;
     }
 
+    /// <summary>
+    /// Intercept the result in case of some value.
+    /// </summary>
+    /// <param name="valueFunction">Value function</param>
+    /// <returns><![CDATA[Result<TValue>]]></returns>
     public Result<TValue> OnSomeValue(Action<TValue> valueFunction)
     {
-        if (HasValue)
+        if (!HasError && HasValue)
             valueFunction(value.GetValue());
 
         return this;
     }
 
+    /// <summary>
+    /// Intercept the result in case of none value.
+    /// </summary>
+    /// <param name="noValueFunction">Value function</param>
+    /// <returns><![CDATA[Result<TValue>]]></returns>
     public Result<TValue> OnNoneValue(Action noValueFunction)
     {
-        if (!HasValue)
+        if (!HasError && !HasValue)
             noValueFunction();
 
         return this;
@@ -79,6 +94,16 @@ public readonly struct Result<TValue>
     /// <returns>Result of T</returns>
     public T Match<T>(Func<TValue, T> some, Func<T> none, Func<Error, T> error)
         => HasError ? error(this.error) : value.Match(some, none);
+
+    /// <summary>
+    /// Result pattern match
+    /// </summary>
+    /// <typeparam name="T">Return type</typeparam>
+    /// <param name="success">Executed when success</param>
+    /// <param name="error">Executed when has error</param>
+    /// <returns>Result of T</returns>
+    public T Match<T>(Func<Unit, T> success, Func<Error, T> error)
+        => HasError ? error(this.error) : success(Unit.Create());
 
 
     public Result<T> Then<T>(Func<TValue, T> function)
@@ -167,10 +192,25 @@ public static class Result
 
     public static Result<T> Of<T>(T? nullable) where T : struct
         => nullable ?? default;
-}
 
-public static class ResultExtensions
-{
+    public static Result<Unit> Then(Action function)
+        => Try(function);
+
+    public static Result<T> Then<T>(Func<T> function)
+        => Try(function);
+
+    public static Result<T> Then<T>(Func<Result<T>> function)
+        => Try(function);
+
+    public async static Task<Result<Unit>> Then(Func<Task> function)
+        => await TryAsync(function);
+
+    public async static Task<Result<T>> Then<T>(Func<Task<T>> function)
+        => await TryAsync(function);
+
+    public async static Task<Result<T>> Then<T>(Func<Task<Result<T>>> function)
+        => await TryAsync(function);
+
     public static Result<C> SelectMany<A, B, C>(this Result<A> monad,
                                                  Func<A, Result<B>> function,
                                                  Func<A, B, C> projection)

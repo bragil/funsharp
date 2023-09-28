@@ -508,7 +508,7 @@ public static class FnUtils
 
     #endregion
 
-    private static Error HandleError(Exception ex, Action<Error> errorHandler = null)
+    internal static Error HandleError(Exception ex, Action<Error> errorHandler = null)
     {
         var error = new Error(ex.Message, ex);
         errorHandler?.Invoke(error);
