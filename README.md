@@ -36,10 +36,10 @@ No caso acima, podem ocorrer 2 situações:
 
 E caso o valor seja **NULL**, pode ter sido por não existir no banco de dados **OU** por ter ocorrido uma `Exception`.
 
-**FunSharp** oferece uma interface fluída para que possamos tratar estas questões de uma forma muito simples, usando o *pattern* [**Monad**](https://mikhail.io/2018/07/monads-explained-in-csharp-again/). Reescrevendo o método acima, basta você envolver o tipo de retorno em um tipo `Res<T>`, no caso, `Res<Pessoa>`, ou seja, o resultado da obtenção do objeto `Pessoa`:
+**FunSharp** oferece uma interface fluída para que possamos tratar estas questões de uma forma muito simples, usando o *pattern* [**Monad**](https://mikhail.io/2018/07/monads-explained-in-csharp-again/). Reescrevendo o método acima, basta você envolver o tipo de retorno em um tipo `Result<T>`, no caso, `Result<Pessoa>`, ou seja, o resultado da obtenção do objeto `Pessoa`:
 
 ```csharp
-public Res<Pessoa> ObterPessoa(int id)
+public Result<Pessoa> ObterPessoa(int id)
 {
     try
     {
@@ -51,7 +51,7 @@ public Res<Pessoa> ObterPessoa(int id)
     }
 }
 ```
-Se ocorrer uma Exception, basta retornar um objeto `Error`, ele será convertido para o tipo `Res<Pessoa>`.
+Se ocorrer uma Exception, basta retornar um objeto `Error`, ele será convertido para o tipo `Result<Pessoa>`.
 
 Ao consumir o método acima, você pode ter uma lógica para cada situação através de *pattern matching*:
 - Retorno de valor (some);
@@ -66,7 +66,7 @@ public IActionResult Get(int id)
     return pessoaService.ObterPessoa(id)
               .Match<IActionResult>(
                   some: pessoa => Ok(pessoa),
-                  none: _ =>      NotFound(),
+                  none: () =>      NotFound(),
                   error: err =>   BadRequest(err.Message)
               );
 
@@ -86,5 +86,5 @@ Ou clique com o botão direito do mouse sobre o projeto onde será instalado o *
 
 Dentro da pasta do projeto onde o **FunSharp** será instalado, digite `dotnet add package FunSharp`.
 
-**FunSharp** oferece muito mais recursos, como tipos opcionais (Opt\<T\>), extensões para **Nullable** e **Task**, dentre outros. Consulte a [wiki](https://github.com/bragil/funsharp/wiki).
+**FunSharp** oferece muito mais recursos, como o tipo MayBe (MayBe\<T\>), extensões para **Nullable** e **Task**, dentre outros. Consulte a [wiki](https://github.com/bragil/funsharp/wiki).
 
