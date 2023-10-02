@@ -111,7 +111,7 @@ public class ResultTests
     public async Task Should_chaining_async_execution_with_unit()
     {
         var value = await Result.Of("test")
-                              .Then(async s => await AsyncNoReturn())
+                              .Then(async s => await AsyncReturnUnit())
                               .Match(u => "unit", () => "none", e => e.Message);
 
         value.ShouldBe("unit");
@@ -121,7 +121,7 @@ public class ResultTests
     public void Should_chaining_execution_with_unit()
     {
         var value = Result.Of("test")
-                      .Then(NoReturn)
+                      .Then(ReturnUnit)
                       .Match(u => "unit", () => "none", e => e.Message);
 
         value.ShouldBe("unit");
@@ -229,14 +229,15 @@ public class ResultTests
         stringResult.OnNoneValue(() => Assert.Pass());
     }
 
-    private async Task AsyncNoReturn()
+    private async Task<Unit> AsyncReturnUnit()
     {
         await Task.CompletedTask;
+        return Unit.Create();
     }
 
-    private void NoReturn(string s)
+    private Unit ReturnUnit(string s)
     {
-
+        return Unit.Create();
     }
 
     private async Task<string> AsyncWithValue()

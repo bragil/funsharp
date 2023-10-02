@@ -122,13 +122,13 @@ public readonly struct Result<TValue>
             (false, false) => None.Create()
         };
 
-    public Result<Unit> Then(Action<TValue> function)
-        => (HasError, HasValue) switch
-        {
-            (true, _) => error,
-            (false, true) => Try(GetValue(), function),
-            (false, false) => None.Create()
-        };
+    ////public Result<Unit> Then(Func<TValue, Unit> function)
+    ////    => (HasError, HasValue) switch
+    ////    {
+    ////        (true, _) => error,
+    ////        (false, true) => Try(GetValue(), function),
+    ////        (false, false) => None.Create()
+    ////    };
 
     public async Task<Result<T>> Then<T>(Func<TValue, Task<T>> function)
         => (HasError, HasValue) switch
@@ -146,13 +146,13 @@ public readonly struct Result<TValue>
             (false, false) => None.Create()
         };
 
-    public async Task<Result<Unit>> Then(Func<TValue, Task> function)
-        => (HasError, HasValue) switch
-        {
-            (true, _) => error,
-            (false, true) => await TryAsync(GetValue(), function),
-            (false, false) => None.Create()
-        };
+    ////public async Task<Result<Unit>> Then(Func<TValue, Task<Unit>> function)
+    ////    => (HasError, HasValue) switch
+    ////    {
+    ////        (true, _) => error,
+    ////        (false, true) => await TryAsync(GetValue(), function),
+    ////        (false, false) => None.Create()
+    ////    };
 
     /// <summary>
     /// Implicit cast operator for return with value.
@@ -193,7 +193,7 @@ public static class Result
     public static Result<T> Of<T>(T? nullable) where T : struct
         => nullable ?? default;
 
-    public static Result<Unit> Then(Action function)
+    public static Result<Unit> Then(Func<Unit> function)
         => Try(function);
 
     public static Result<T> Then<T>(Func<T> function)
@@ -202,7 +202,7 @@ public static class Result
     public static Result<T> Then<T>(Func<Result<T>> function)
         => Try(function);
 
-    public async static Task<Result<Unit>> Then(Func<Task> function)
+    public async static Task<Result<Unit>> Then(Func<Task<Unit>> function)
         => await TryAsync(function);
 
     public async static Task<Result<T>> Then<T>(Func<Task<T>> function)

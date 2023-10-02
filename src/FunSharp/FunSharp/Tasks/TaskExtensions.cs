@@ -53,59 +53,59 @@ public static class TaskExtensions
         return result;
     }
 
-    /// <summary>
-    /// <![CDATA[
-    /// Chaining a task of Result<T>.
-    /// ]]>
-    /// </summary>
-    /// <typeparam name="TIn">Value type</typeparam>
-    /// <param name="source">Source task</param>
-    /// <param name="function">Function to be applied to the task</param>
-    /// <returns><![CDATA[New task of Result<Unit>]]></returns>
-    public static async Task<Result<Unit>> Then<TIn>(this Task<Result<TIn>> source,
-                                                     Func<TIn, Task> function)
-    {
-        try
-        {
-            var res = await source;
-            if (res.HasError)
-                return res.GetError();
+    /////// <summary>
+    /////// <![CDATA[
+    /////// Chaining a task of Result<T>.
+    /////// ]]>
+    /////// </summary>
+    /////// <typeparam name="TIn">Value type</typeparam>
+    /////// <param name="source">Source task</param>
+    /////// <param name="function">Function to be applied to the task</param>
+    /////// <returns><![CDATA[New task of Result<Unit>]]></returns>
+    ////public static async Task<Result<Unit>> Then<TIn>(this Task<Result<TIn>> source,
+    ////                                                 Func<TIn, Task> function)
+    ////{
+    ////    try
+    ////    {
+    ////        var res = await source;
+    ////        if (res.HasError)
+    ////            return res.GetError();
             
-            await function(res.GetValueOrElse(default));
-            return Unit.Create();
-        }
-        catch (Exception ex)
-        {
-            return new Error(ex.Message, ex);
-        }
-    }
+    ////        await function(res.GetValueOrElse(default));
+    ////        return Unit.Create();
+    ////    }
+    ////    catch (Exception ex)
+    ////    {
+    ////        return new Error(ex.Message, ex);
+    ////    }
+    ////}
 
-    /// <summary>
-    /// <![CDATA[
-    /// Chaining a task of Result<T>.
-    /// ]]>
-    /// </summary>
-    /// <typeparam name="TIn">Value type</typeparam>
-    /// <param name="source">Source task</param>
-    /// <param name="function">Function to be applied to the task</param>
-    /// <returns><![CDATA[New task of Result<Unit>]]></returns>
-    public static async Task<Result<Unit>> Then<TIn>(this Task<Result<TIn>> source,
-                                                     Action<TIn> function)
-    {
-        try
-        {
-            var res = await source;
-            if (res.HasError)
-                return res.GetError();
+    /////// <summary>
+    /////// <![CDATA[
+    /////// Chaining a task of Result<T>.
+    /////// ]]>
+    /////// </summary>
+    /////// <typeparam name="TIn">Value type</typeparam>
+    /////// <param name="source">Source task</param>
+    /////// <param name="function">Function to be applied to the task</param>
+    /////// <returns><![CDATA[New task of Result<Unit>]]></returns>
+    ////public static async Task<Result<Unit>> Then<TIn>(this Task<Result<TIn>> source,
+    ////                                                 Action<TIn> function)
+    ////{
+    ////    try
+    ////    {
+    ////        var res = await source;
+    ////        if (res.HasError)
+    ////            return res.GetError();
 
-            function(res.GetValueOrElse(default));
-            return Unit.Create();
-        }
-        catch (Exception ex)
-        {
-            return new Error(ex.Message, ex);
-        }
-    }
+    ////        function(res.GetValueOrElse(default));
+    ////        return Unit.Create();
+    ////    }
+    ////    catch (Exception ex)
+    ////    {
+    ////        return new Error(ex.Message, ex);
+    ////    }
+    ////}
 
     /// <summary>
     /// <![CDATA[
