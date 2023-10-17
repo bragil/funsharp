@@ -1,4 +1,6 @@
-﻿using static FunSharp.FnUtils;
+﻿using System;
+using System.Threading.Tasks;
+using static FunSharp.FnUtils;
 
 namespace FunSharp;
 

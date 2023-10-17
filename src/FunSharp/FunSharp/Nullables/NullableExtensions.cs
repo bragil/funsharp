@@ -1,4 +1,6 @@
-﻿namespace FunSharp.Nullables;
+﻿using System;
+
+namespace FunSharp.Nullables;
 
 public static class NullableExtensions
 {

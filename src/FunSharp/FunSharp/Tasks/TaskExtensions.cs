@@ -1,4 +1,7 @@
-﻿namespace FunSharp.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+
+namespace FunSharp.Tasks;
 
 public static class TaskExtensions
 {

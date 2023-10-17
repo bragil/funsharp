@@ -1,4 +1,6 @@
-﻿namespace FunSharp;
+﻿using System;
+
+namespace FunSharp;
 
 /// <summary>
 /// Implementação de discriminated unions em C#.

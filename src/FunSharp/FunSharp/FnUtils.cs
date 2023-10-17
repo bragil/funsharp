@@ -1,4 +1,8 @@
-﻿namespace FunSharp;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace FunSharp;
 
 /// <summary>
 /// Functional utilities.

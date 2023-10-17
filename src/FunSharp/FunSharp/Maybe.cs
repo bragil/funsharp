@@ -1,4 +1,6 @@
-﻿namespace FunSharp;
+﻿using System;
+
+namespace FunSharp;
 
 /// <summary>
 /// Maybe Monad
