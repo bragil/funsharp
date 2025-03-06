@@ -23,6 +23,23 @@ public static class TaskExtensions
     }
 
     /// <summary>
+    /// Intercept the result in case of error.
+    /// </summary>
+    /// <typeparam name="T">Value type</typeparam>
+    /// <param name="source">Source task</param>
+    /// <param name="errorFunction">Error function</param>
+    /// <returns><![CDATA[Task<Result<T>>]]></returns>
+    public async static Task<Result<T>> OnError<T>(this Task<Result<T>> source,
+                                                   Func<Error, Error> errorFunction)
+    {
+        var result = await source;
+        if (result.HasError)
+            return errorFunction(result.GetError());
+
+        return result;
+    }
+
+    /// <summary>
     /// Intercept the result in case of some value.
     /// </summary>
     /// <typeparam name="T">Value type</typeparam>
@@ -55,60 +72,6 @@ public static class TaskExtensions
 
         return result;
     }
-
-    /////// <summary>
-    /////// <![CDATA[
-    /////// Chaining a task of Result<T>.
-    /////// ]]>
-    /////// </summary>
-    /////// <typeparam name="TIn">Value type</typeparam>
-    /////// <param name="source">Source task</param>
-    /////// <param name="function">Function to be applied to the task</param>
-    /////// <returns><![CDATA[New task of Result<Unit>]]></returns>
-    ////public static async Task<Result<Unit>> Then<TIn>(this Task<Result<TIn>> source,
-    ////                                                 Func<TIn, Task> function)
-    ////{
-    ////    try
-    ////    {
-    ////        var res = await source;
-    ////        if (res.HasError)
-    ////            return res.GetError();
-            
-    ////        await function(res.GetValueOrElse(default));
-    ////        return Unit.Create();
-    ////    }
-    ////    catch (Exception ex)
-    ////    {
-    ////        return new Error(ex.Message, ex);
-    ////    }
-    ////}
-
-    /////// <summary>
-    /////// <![CDATA[
-    /////// Chaining a task of Result<T>.
-    /////// ]]>
-    /////// </summary>
-    /////// <typeparam name="TIn">Value type</typeparam>
-    /////// <param name="source">Source task</param>
-    /////// <param name="function">Function to be applied to the task</param>
-    /////// <returns><![CDATA[New task of Result<Unit>]]></returns>
-    ////public static async Task<Result<Unit>> Then<TIn>(this Task<Result<TIn>> source,
-    ////                                                 Action<TIn> function)
-    ////{
-    ////    try
-    ////    {
-    ////        var res = await source;
-    ////        if (res.HasError)
-    ////            return res.GetError();
-
-    ////        function(res.GetValueOrElse(default));
-    ////        return Unit.Create();
-    ////    }
-    ////    catch (Exception ex)
-    ////    {
-    ////        return new Error(ex.Message, ex);
-    ////    }
-    ////}
 
     /// <summary>
     /// <![CDATA[

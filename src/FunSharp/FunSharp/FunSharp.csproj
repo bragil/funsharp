@@ -9,10 +9,10 @@
 	<RepositoryUrl>https://github.com/bragil/funsharp</RepositoryUrl>
 	<PackageProjectUrl>https://github.com/bragil/funsharp</PackageProjectUrl>
 	<Description>Provides a functional programming approach to elegantly handle errors and avoid problems with null values.</Description>
-	<AssemblyVersion>2.0.6.0</AssemblyVersion>
-	<FileVersion>2.0.6.0</FileVersion>
+	<AssemblyVersion>2.0.8.0</AssemblyVersion>
+	<FileVersion>2.0.8.0</FileVersion>
 	<Authors>bragil@gmail.com</Authors>
-	<Version>2.0.6.0</Version>
+	<Version>2.0.8.0</Version>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>

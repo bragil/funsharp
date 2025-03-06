@@ -53,6 +53,19 @@ public readonly struct Result<TValue>
     }
 
     /// <summary>
+    /// Intercept the result in case of error.
+    /// </summary>
+    /// <param name="errorFunction">Error function</param>
+    /// <returns><![CDATA[Result<TValue>]]></returns>
+    public Result<TValue> OnError(Func<Error, Error> errorFunction)
+    {
+        if (HasError)
+            return errorFunction(error);
+
+        return this;
+    }
+
+    /// <summary>
     /// Intercept the result in case of some value.
     /// </summary>
     /// <param name="valueFunction">Value function</param>
@@ -124,14 +137,6 @@ public readonly struct Result<TValue>
             (false, false) => None.Create()
         };
 
-    ////public Result<Unit> Then(Func<TValue, Unit> function)
-    ////    => (HasError, HasValue) switch
-    ////    {
-    ////        (true, _) => error,
-    ////        (false, true) => Try(GetValue(), function),
-    ////        (false, false) => None.Create()
-    ////    };
-
     public async Task<Result<T>> Then<T>(Func<TValue, Task<T>> function)
         => (HasError, HasValue) switch
         {
@@ -147,14 +152,6 @@ public readonly struct Result<TValue>
             (false, true) => await TryAsync(GetValue(), function),
             (false, false) => None.Create()
         };
-
-    ////public async Task<Result<Unit>> Then(Func<TValue, Task<Unit>> function)
-    ////    => (HasError, HasValue) switch
-    ////    {
-    ////        (true, _) => error,
-    ////        (false, true) => await TryAsync(GetValue(), function),
-    ////        (false, false) => None.Create()
-    ////    };
 
     /// <summary>
     /// Implicit cast operator for return with value.
